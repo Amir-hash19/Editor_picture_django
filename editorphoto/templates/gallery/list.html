@@ -1,0 +1,18 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+{% block content %}
+<h2>my photos</h2>
+{% for image in images %}
+  <div>
+    <img src="{{ image.original.url }}" width="200" />
+    {% if image.edited %}
+      <p>Recommended:</p>
+      <img src="{{ image.edited.url }}" width="200" />
+    {% endif %}
+    <br>
+    <a href="{% url 'bw' image.id %}">black and white</a> |
+    <a href="{% url 'watermark' image.id %}">Water mark</a>
+  </div>
+{% endfor %}
+{% endblock %}
+
