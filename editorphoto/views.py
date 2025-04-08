@@ -58,7 +58,6 @@ def black_and_white(request, image_id):
 
 
 
-@login_required
 def add_watermark_view(request, image_id):
     img = get_object_or_404(UserImage, id=image_id, user=request.user)
     path = img.original.path
@@ -68,8 +67,13 @@ def add_watermark_view(request, image_id):
 
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36)
     text = "Watermark"
-    w, h = draw.textsize(text, font)
-    draw.text(((image.width - w) / 2, (image.height - h) / 2), text, font=font, fill=(255, 255, 255, 128))
+    bbox = draw.textbbox((0, 0), text, font=font)
+    width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    
+    text_x = (image.width - width) / 2
+    text_y = (image.height - height) / 2
+
+    draw.text((text_x, text_y), text, font=font, fill=(255, 255, 255, 128))
 
     out = Image.alpha_composite(image, watermark).convert("RGB")
     edited_path = path.replace('original', 'edited')
@@ -77,4 +81,5 @@ def add_watermark_view(request, image_id):
 
     img.edited.name = edited_path.split('media/')[-1]
     img.save()
+
     return redirect('list')
